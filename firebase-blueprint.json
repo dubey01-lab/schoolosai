@@ -1,0 +1,256 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user in the system (Admin, Teacher, Parent)",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["ADMIN", "TEACHER", "PARENT"] },
+        "schoolId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "name", "role", "schoolId"]
+    },
+    "School": {
+      "title": "School",
+      "description": "A school tenant",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "A student enrolled in a school",
+      "type": "object",
+      "properties": {
+        "schoolId": { "type": "string" },
+        "name": { "type": "string" },
+        "rollNumber": { "type": "string" },
+        "class": { "type": "string" },
+        "section": { "type": "string" },
+        "parentId": { "type": "string" },
+        "parentName": { "type": "string" },
+        "parentPhone": { "type": "string" },
+        "parentEmail": { "type": "string" },
+        "dob": { "type": "string" },
+        "gender": { "type": "string" },
+        "address": { "type": "string" },
+        "admissionDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["schoolId", "name", "rollNumber", "class", "section", "parentId"]
+    },
+    "Teacher": {
+      "title": "Teacher",
+      "description": "A teacher working in a school",
+      "type": "object",
+      "properties": {
+        "schoolId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "subject": { "type": "string" },
+        "classes": { "type": "array", "items": { "type": "string" } },
+        "joiningDate": { "type": "string" },
+        "qualification": { "type": "string" },
+        "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["schoolId", "name", "email"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Daily attendance record for a student",
+      "type": "object",
+      "properties": {
+        "schoolId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "class": { "type": "string" },
+        "section": { "type": "string" },
+        "date": { "type": "string" },
+        "status": { "type": "string", "enum": ["PRESENT", "ABSENT", "LATE", "LEAVE"] },
+        "markedBy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["schoolId", "studentId", "class", "date", "status"]
+    },
+    "Fee": {
+      "title": "Fee",
+      "description": "A fee record for a student",
+      "type": "object",
+      "properties": {
+        "schoolId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "feeType": { "type": "string" },
+        "amount": { "type": "number" },
+        "discount": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["PAID", "PARTIAL", "PENDING", "OVERDUE"] },
+        "dueDate": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["schoolId", "studentId", "feeType", "amount", "totalAmount", "paidAmount", "status", "dueDate"]
+    },
+    "FeeTransaction": {
+      "title": "FeeTransaction",
+      "description": "A payment transaction for a fee",
+      "type": "object",
+      "properties": {
+        "schoolId": { "type": "string" },
+        "feeId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "amount": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "referenceNumber": { "type": "string" },
+        "date": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["schoolId", "feeId", "studentId", "amount", "paymentMethod", "date"]
+    },
+    "Notice": {
+      "title": "Notice",
+      "description": "School announcement or notice",
+      "type": "object",
+      "properties": {
+        "schoolId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "audience": { "type": "string", "enum": ["ALL_PARENTS", "ALL_TEACHERS", "ALL_STUDENTS", "SPECIFIC_CLASS", "SPECIFIC_SECTION"] },
+        "targetClass": { "type": "string" },
+        "targetSection": { "type": "string" },
+        "status": { "type": "string", "enum": ["DRAFT", "SCHEDULED", "PUBLISHED", "ARCHIVED"] },
+        "publishDate": { "type": "string" },
+        "scheduledDate": { "type": "string" },
+        "attachments": { "type": "array", "items": { "type": "string" } },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["schoolId", "title", "content", "audience", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "A notification delivered to a user",
+      "type": "object",
+      "properties": {
+        "schoolId": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["NOTICE", "FEE_REMINDER", "ATTENDANCE_ALERT", "HOMEWORK", "SYSTEM"] },
+        "referenceId": { "type": "string" },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["schoolId", "userId", "title", "message", "type", "isRead", "createdAt"]
+    },
+    "NotificationPreference": {
+      "title": "NotificationPreference",
+      "description": "User notification preferences",
+      "type": "object",
+      "properties": {
+        "schoolId": { "type": "string" },
+        "userId": { "type": "string" },
+        "channels": {
+          "type": "object",
+          "properties": {
+            "inApp": { "type": "boolean" },
+            "email": { "type": "boolean" },
+            "whatsapp": { "type": "boolean" },
+            "sms": { "type": "boolean" }
+          }
+        },
+        "events": {
+          "type": "object",
+          "properties": {
+            "attendance": { "type": "boolean" },
+            "fees": { "type": "boolean" },
+            "homework": { "type": "boolean" },
+            "exams": { "type": "boolean" },
+            "notices": { "type": "boolean" }
+          }
+        },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["schoolId", "userId"]
+    },
+    "Complaint": {
+      "title": "Complaint",
+      "description": "A complaint or helpdesk request",
+      "type": "object",
+      "properties": {
+        "schoolId": { "type": "string" },
+        "parentId": { "type": "string" },
+        "category": { "type": "string" },
+        "subject": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"] },
+        "adminReply": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["schoolId", "parentId", "category", "subject", "description", "status"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "schools/{schoolId}": {
+      "schema": { "$ref": "#/entities/School" },
+      "description": "School tenants"
+    },
+    "students/{studentId}": {
+      "schema": { "$ref": "#/entities/Student" },
+      "description": "Students in the system"
+    },
+    "teachers/{teacherId}": {
+      "schema": { "$ref": "#/entities/Teacher" },
+      "description": "Teachers in the system"
+    },
+    "attendance/{attendanceId}": {
+      "schema": { "$ref": "#/entities/Attendance" },
+      "description": "Attendance records"
+    },
+    "fees/{feeId}": {
+      "schema": { "$ref": "#/entities/Fee" },
+      "description": "Fee records"
+    },
+    "feeTransactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/FeeTransaction" },
+      "description": "Fee transaction records"
+    },
+    "notices/{noticeId}": {
+      "schema": { "$ref": "#/entities/Notice" },
+      "description": "Notices and announcements"
+    },
+    "notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "User notifications"
+    },
+    "notificationPreferences/{preferenceId}": {
+      "schema": { "$ref": "#/entities/NotificationPreference" },
+      "description": "Notification settings per user"
+    },
+    "complaints/{complaintId}": {
+      "schema": { "$ref": "#/entities/Complaint" },
+      "description": "Complaints and helpdesk"
+    }
+  }
+}
