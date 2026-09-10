@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /teacher/
+Disallow: /parent/
+Disallow: /superadmin/
+Disallow: /login
+Disallow: /setup
+
+Sitemap: https://schoolosai.vercel.app/sitemap.xml

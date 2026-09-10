@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
       await auth.signOut();
-      throw new Error("Account configuration error. User record not found in database. If you are setting up the platform, use the 'Initialize Platform' link.");
+      throw new Error("Account configuration error. User record not found in database.");
     }
     const data = docSnap.data() as User;
     setUserData(data);

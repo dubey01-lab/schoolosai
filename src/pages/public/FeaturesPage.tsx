@@ -1,4 +1,5 @@
 import React from "react";
+import { SEO } from "../../components/SEO";
 import { Link } from "react-router-dom";
 import { ArrowRight, Users, GraduationCap, CalendarCheck, CreditCard, BookOpen, FileText, Bell, UserPlus, BarChart3, LayoutDashboard } from "lucide-react";
 import { PublicNavbar } from "../../components/public/PublicNavbar";
@@ -22,6 +23,13 @@ export default function FeaturesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 flex flex-col">
+      <SEO 
+        title="School Management Software Features | SchoolOS AI" 
+        description="Explore SchoolOS AI features including student management, teacher management, attendance tracking, fee receipts, homework management, exams, results, notices, and parent portals." 
+        canonicalUrl="/features" 
+        noindex={false}
+      />
+      
       <PublicNavbar />
       
       <section className="pt-32 pb-16 px-6 lg:px-12 max-w-7xl mx-auto text-center">

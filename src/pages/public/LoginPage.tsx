@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SEO } from "../../components/SEO";
 import { useNavigate } from "react-router-dom";
 import { GraduationCap, Loader2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
@@ -15,7 +16,8 @@ export default function LoginPage() {
   React.useEffect(() => {
     if (userData) {
       if (userData.role === "SUPER_ADMIN") {
-        return; // Handled in render now
+        toast.error("Super Admin accounts must use the Super Admin Portal.");
+        navigate("/superadmin/login");
       } else if (userData.role === "ADMIN") navigate("/admin/dashboard");
       else if (userData.role === "TEACHER") navigate("/teacher/dashboard");
       else if (userData.role === "PARENT") navigate("/parent/dashboard");
@@ -43,35 +45,24 @@ export default function LoginPage() {
   };
 
   
-  if (userData?.role === "SUPER_ADMIN") {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-xl border border-slate-100 text-center">
-          <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
-             <GraduationCap className="w-8 h-8 text-rose-600" />
-          </div>
-          <h2 className="text-xl font-bold text-slate-900 mb-2">Platform Administrator</h2>
-          <p className="text-slate-500 mb-6">This account is a platform administrator. Please use the Super Admin login.</p>
-          <button 
-            onClick={() => navigate('/superadmin/login')}
-            className="w-full bg-indigo-600 text-white font-medium py-3 rounded-xl hover:bg-indigo-700 transition-all"
-          >
-            Go to Super Admin Login
-          </button>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <SEO 
+        title="SchoolOS AI Login | Principal, Teacher & Parent" 
+        description="Securely log in to your SchoolOS AI school management portal as a Principal, Admin, Teacher, or Parent." 
+        canonicalUrl="/login" 
+        noindex={true}
+      />
+      
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
           <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-600/20">
             <GraduationCap className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome back</h1>
-          <p className="text-slate-500 mt-2">Sign in to your SchoolOS AI account</p>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">SchoolOS AI Login</h1>
+          <p className="text-slate-500 mt-2">Principal / Teacher / Parent</p>
         </div>
 
         <div className="bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
@@ -112,9 +103,7 @@ export default function LoginPage() {
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign in"}
             </button>
-            <div className="mt-6 text-center text-sm text-slate-500">
-              First time installation? <a href="/setup" className="text-indigo-600 font-medium hover:underline">Initialize Platform</a>
-            </div>
+            
           </form>
         </div>
       </div>

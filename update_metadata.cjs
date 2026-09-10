@@ -1,0 +1,33 @@
+const fs = require('fs');
+
+// Update metadata.json
+let metadata = JSON.parse(fs.readFileSync('metadata.json', 'utf-8'));
+metadata.name = "SchoolOS AI — School Management Platform";
+metadata.description = "SchoolOS AI is a modern school management platform for principals, teachers, and parents.";
+fs.writeFileSync('metadata.json', JSON.stringify(metadata, null, 2));
+
+// Update index.html
+let indexHtml = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SchoolOS AI — School Management Platform</title>
+    <meta name="description" content="SchoolOS AI is a modern school management platform for principals, teachers, and parents." />
+    <link rel="canonical" href="https://schoolosai.vercel.app/" />
+    
+    <meta property="og:site_name" content="SchoolOS AI" />
+    <meta property="og:title" content="SchoolOS AI — School Management Platform" />
+    <meta property="og:description" content="SchoolOS AI is a modern school management platform for principals, teachers, and parents." />
+    <meta property="og:type" content="website" />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SchoolOS AI — School Management Platform" />
+    <meta name="twitter:description" content="SchoolOS AI is a modern school management platform for principals, teachers, and parents." />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>`;
+fs.writeFileSync('index.html', indexHtml);

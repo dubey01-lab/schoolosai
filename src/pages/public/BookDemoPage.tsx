@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SEO } from "../../components/SEO";
 import { Send, Loader2, CheckCircle2 } from "lucide-react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../lib/firebase";
@@ -14,7 +15,7 @@ export default function BookDemoPage() {
     country: "",
     city: "",
     role: "",
-    studentsCount: "",
+    studentCount: "",
     contactMethod: "email",
     message: ""
   });
@@ -30,9 +31,9 @@ export default function BookDemoPage() {
     try {
       await addDoc(collection(db, "enquiries"), {
         ...formData,
-        type: "demo",
+        source: "BOOK_DEMO",
         status: "NEW",
-        createdAt: serverTimestamp()
+        createdAt: new Date().toISOString()
       });
       setSuccess(true);
     } catch (err: any) {
@@ -45,6 +46,13 @@ export default function BookDemoPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 flex flex-col">
+      <SEO 
+        title="Book a School Management Software Demo | SchoolOS AI" 
+        description="Book a demo with SchoolOS AI to see how our modern school management platform can streamline your administrative workflows, fee management, and parent communication." 
+        canonicalUrl="/book-demo" 
+        noindex={false}
+      />
+      
       <PublicNavbar />
       
       <section className="pt-32 pb-12 px-6 lg:px-12 max-w-3xl mx-auto w-full text-center">
@@ -147,8 +155,8 @@ export default function BookDemoPage() {
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Number of Students</label>
                   <select
-                    required value={formData.studentsCount}
-                    onChange={e => setFormData({...formData, studentsCount: e.target.value})}
+                    required value={formData.studentCount}
+                    onChange={e => setFormData({...formData, studentCount: e.target.value})}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
                   >
                     <option value="">Select range...</option>

@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+import { downloadCSV } from "../../lib/exportUtils";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Download, IndianRupee, Clock, AlertCircle, TrendingUp, TrendingDown, Users, Receipt } from "lucide-react";
@@ -9,7 +11,26 @@ import { format } from "date-fns";
 
 export default function AdminFees() {
   const { userData } = useAuth();
+  const [fees, setFees] = useState<StudentFee[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleExport = () => {
+    if (fees.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+    const data = fees.map(f => ({
+      FeeType: f.id,
+      TotalAmount: f.totalAmount,
+      PaidAmount: f.paidAmount,
+      PendingAmount: f.pendingAmount,
+      Status: f.status,
+      DueDate: f.dueDate
+    }));
+    downloadCSV(data, `fees_${new Date().getTime()}.csv`);
+    toast.success("Export successful");
+  };
+
   const [stats, setStats] = useState({
     totalFees: 0,
     collected: 0,
@@ -93,7 +114,7 @@ export default function AdminFees() {
           <p className="text-slate-500 mt-1">Track collections, pending payments and student fee activity in one place.</p>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
-          <button className="flex-1 sm:flex-none bg-white text-slate-700 px-4 py-2.5 rounded-xl font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 border border-slate-200 shadow-sm active:scale-95">
+          <button onClick={handleExport} className="flex-1 sm:flex-none bg-white text-slate-700 px-4 py-2.5 rounded-xl font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 border border-slate-200 shadow-sm active:scale-95">
             <Download className="w-4 h-4" /> Export Report
           </button>
           <Link to="/admin/fees/structure" className="flex-1 sm:flex-none bg-white text-slate-700 px-4 py-2.5 rounded-xl font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 border border-slate-200 shadow-sm active:scale-95">

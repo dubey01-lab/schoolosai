@@ -1,3 +1,4 @@
+import { downloadCSV } from "../../lib/exportUtils";
 import React, { useState, useEffect } from "react";
 import { Users, CreditCard, CalendarCheck, Clock, UserCheck, FileText, BarChart, UserPlus } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -9,6 +10,16 @@ import { Student, Teacher, AdmissionEnquiry, StudentFee, AttendanceRecord } from
 
 export default function AdminDashboard() {
   const { userData } = useAuth();
+
+  const handleExport = () => {
+    const data = [
+      { Metric: "Total Students", Value: stats.students },
+      { Metric: "Total Teachers", Value: stats.teachers },
+      { Metric: "Total Fees", Value: stats.feesCollected }
+    ];
+    downloadCSV(data, `dashboard_report_${new Date().getTime()}.csv`);
+  };
+
   const [stats, setStats] = useState({
     students: 0,
     teachers: 0,
@@ -109,7 +120,7 @@ export default function AdminDashboard() {
           <p className="text-slate-500 mt-1">Here's what's happening at {schoolName} today.</p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">Download Report</button>
+          <button onClick={handleExport} className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">Download Report</button>
         </div>
       </div>
 

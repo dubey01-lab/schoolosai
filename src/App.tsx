@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import LandingPage from "./pages/public/LandingPage";
 import LoginPage from "./pages/public/LoginPage";
-import SetupPage from "./pages/public/SetupPage";
 import FeaturesPage from "./pages/public/FeaturesPage";
 import SolutionsPage from "./pages/public/SolutionsPage";
 import HowItWorksPage from "./pages/public/HowItWorksPage";
@@ -11,6 +11,7 @@ import AboutPage from "./pages/public/AboutPage";
 import PricingPage from "./pages/public/PricingPage";
 import ContactPage from "./pages/public/ContactPage";
 import BookDemoPage from "./pages/public/BookDemoPage";
+import NotFoundPage from "./pages/public/NotFoundPage";
 import { AppLayout } from "./components/AppLayout";
 import { Toaster } from "react-hot-toast";
 
@@ -50,6 +51,10 @@ import AdminClasses from "./pages/admin/AdminClasses";
 import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
 import SuperAdminSchoolManage from "./pages/superadmin/SuperAdminSchoolManage";
 import SuperAdminLogin from "./pages/superadmin/SuperAdminLogin";
+import AdminSupport from "./pages/admin/AdminSupport";
+import SuperAdminEnquiries from "./pages/superadmin/SuperAdminEnquiries";
+import SuperAdminSupport from "./pages/superadmin/SuperAdminSupport";
+
 
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) {
   const { user, userData, loading } = useAuth();
@@ -79,8 +84,8 @@ function AppRoutes() {
       <Route path="/book-demo" element={<BookDemoPage />} />
       
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/setup" element={<SetupPage />} />
-      
+      <Route path="*" element={<NotFoundPage />} />
+            
       {/* Super Admin Routes */}
       <Route path="/superadmin/login" element={<SuperAdminLogin />} />
       <Route path="/superadmin/*" element={
@@ -89,7 +94,9 @@ function AppRoutes() {
             <Routes>
               <Route path="dashboard" element={<SuperAdminDashboard />} />
               <Route path="schools/:schoolId" element={<SuperAdminSchoolManage />} />
-              <Route path="*" element={<div className="p-8 text-center text-slate-500">Coming soon.</div>} />
+              <Route path="enquiries" element={<SuperAdminEnquiries />} />
+              <Route path="support" element={<SuperAdminSupport />} />
+              <Route path="*" element={<div className="p-8 text-center text-slate-500">Page Not Found</div>} />
             </Routes>
           </AppLayout>
         </ProtectedRoute>
@@ -107,6 +114,7 @@ function AppRoutes() {
               <Route path="attendance" element={<AdminAttendance />} />
               <Route path="exams" element={<AdminExams />} />
               <Route path="admissions" element={<AdminAdmissions />} />
+              <Route path="support" element={<AdminSupport />} />
               <Route path="reports" element={<AdminReports />} />
               <Route path="classes" element={<AdminClasses />} />
               <Route path="ai" element={<AdminAI />} />
@@ -122,7 +130,7 @@ function AppRoutes() {
               <Route path="notices/analytics" element={<AdminNoticesAnalytics />} />
               <Route path="notifications" element={<AdminNotifications />} />
               <Route path="settings/notifications" element={<AdminSettingsNotifications />} />
-              <Route path="*" element={<div className="p-8 text-center text-slate-500">Coming soon.</div>} />
+              <Route path="*" element={<div className="p-8 text-center text-slate-500">Page Not Found</div>} />
             </Routes>
           </AppLayout>
         </ProtectedRoute>
@@ -137,7 +145,7 @@ function AppRoutes() {
               <Route path="classes" element={<TeacherClasses />} />
               <Route path="classes/:classId" element={<TeacherClassDetails />} />
               <Route path="notices" element={<TeacherNotices />} />
-              <Route path="*" element={<div className="p-8 text-center text-slate-500">Coming soon.</div>} />
+              <Route path="*" element={<div className="p-8 text-center text-slate-500">Page Not Found</div>} />
             </Routes>
           </AppLayout>
         </ProtectedRoute>
@@ -154,7 +162,7 @@ function AppRoutes() {
               <Route path="results" element={<ParentResults />} />
               <Route path="notices" element={<ParentNotices />} />
               <Route path="fees" element={<ParentFees />} />
-              <Route path="*" element={<div className="p-8 text-center text-slate-500">Coming soon.</div>} />
+              <Route path="*" element={<div className="p-8 text-center text-slate-500">Page Not Found</div>} />
             </Routes>
           </AppLayout>
         </ProtectedRoute>
@@ -170,7 +178,7 @@ function GlobalShortcuts() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
         e.preventDefault();
-        navigate('/login?role=superadmin');
+        navigate('/superadmin/login');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -182,12 +190,14 @@ function GlobalShortcuts() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <GlobalShortcuts />
-        <AppRoutes />
-        <Toaster position="top-right" />
-      </AuthProvider>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <GlobalShortcuts />
+          <AppRoutes />
+          <Toaster position="top-right" />
+        </AuthProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }

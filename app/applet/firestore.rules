@@ -48,7 +48,7 @@ service cloud.firestore {
       allow update, delete: if isAdmin() && request.resource.data.get('schoolId', null) == getUserSchoolId() && request.resource.data.get('role', '') != 'SUPER_ADMIN';
       
       // Allow initial setup: user can create their own profile
-      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && request.auth.uid == userId && request.resource.data.get('role', '') != 'SUPER_ADMIN';
       allow create: if isSuperAdmin();
       allow create: if isAdmin() && request.resource.data.get('schoolId', null) == getUserSchoolId() && request.resource.data.get('role', '') != 'SUPER_ADMIN';
     }

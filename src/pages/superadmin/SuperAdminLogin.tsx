@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SEO } from "../../components/SEO";
 import { useNavigate } from "react-router-dom";
 import { ShieldAlert, Loader2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
@@ -43,12 +44,18 @@ export default function SuperAdminLogin() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <SEO 
+      title="SchoolOS AI — Super Admin Portal" 
+      description="Private platform administration" 
+      noindex={true}
+    />
+    
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
           <div className="w-16 h-16 bg-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-rose-600/20">
             <ShieldAlert className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Super Admin Login</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight">SchoolOS AI — Super Admin Portal</h1>
           <p className="text-slate-400 mt-2">Private platform administration</p>
         </div>
 
@@ -83,7 +90,7 @@ export default function SuperAdminLogin() {
               disabled={loading}
               className="w-full mt-6 bg-rose-600 text-white font-medium py-3 rounded-xl hover:bg-rose-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Access Platform"}
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
             </button>
           </form>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SEO } from "../../components/SEO";
 import { Mail, Phone, MapPin, Send, Loader2, CheckCircle2 } from "lucide-react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../lib/firebase";
@@ -24,9 +25,9 @@ export default function ContactPage() {
     try {
       await addDoc(collection(db, "enquiries"), {
         ...formData,
-        type: "contact",
+        source: "CONTACT",
         status: "NEW",
-        createdAt: serverTimestamp()
+        createdAt: new Date().toISOString()
       });
       setSuccess(true);
     } catch (err: any) {
@@ -39,6 +40,13 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 flex flex-col">
+      <SEO 
+        title="Contact SchoolOS AI | School Management Software" 
+        description="Get in touch with SchoolOS AI for support, sales, or partnership inquiries regarding our modern school management software." 
+        canonicalUrl="/contact" 
+        noindex={false}
+      />
+      
       <PublicNavbar />
       
       <section className="pt-32 pb-16 px-6 lg:px-12 max-w-7xl mx-auto w-full text-center">

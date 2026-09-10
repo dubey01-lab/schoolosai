@@ -7,6 +7,7 @@ import { db } from "../../lib/firebase";
 import { collection, query, where, getDocs, doc, setDoc, getDoc } from "firebase/firestore";
 import { Student, AttendanceRecord } from "../../types";
 import toast from "react-hot-toast";
+import { downloadCSV } from "../../lib/exportUtils";
 
 export default function AdminAttendance() {
   const { userData } = useAuth();
@@ -16,6 +17,23 @@ export default function AdminAttendance() {
   const [attendanceState, setAttendanceState] = useState<Record<string, "PRESENT" | "ABSENT" | "LATE" | "HALF_DAY">>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleExport = () => {
+    if (students.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+    const data = students.map(s => ({
+      ID: s.rollNumber || s.id,
+      Name: s.name,
+      Class: s.class,
+      Section: s.section,
+      Status: attendanceState[s.id!] || "Not Marked"
+    }));
+    downloadCSV(data, `attendance_${selectedClass}_${date}.csv`);
+    toast.success("Export successful");
+  };
+
   const [saving, setSaving] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 

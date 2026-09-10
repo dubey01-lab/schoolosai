@@ -1,4 +1,5 @@
 import React from "react";
+import { SEO } from "../../components/SEO";
 import { Link } from "react-router-dom";
 import { Building2, Settings, Users, ArrowDown, GraduationCap, CheckCircle2 } from "lucide-react";
 import { PublicNavbar } from "../../components/public/PublicNavbar";
@@ -40,6 +41,13 @@ export default function HowItWorksPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 flex flex-col">
+      <SEO 
+        title="How SchoolOS AI Works | School Management Platform" 
+        description="Learn how SchoolOS AI works to centralize your school administration workflows. Principals manage, teachers operate, and parents stay informed." 
+        canonicalUrl="/how-it-works" 
+        noindex={false}
+      />
+      
       <PublicNavbar />
       
       <section className="pt-32 pb-16 px-6 lg:px-12 max-w-7xl mx-auto text-center">

@@ -1,4 +1,5 @@
 import React from "react";
+import { SEO } from "../../components/SEO";
 import { Link } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import { PublicNavbar } from "../../components/public/PublicNavbar";
@@ -7,6 +8,13 @@ import { PublicFooter } from "../../components/public/PublicFooter";
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 flex flex-col">
+      <SEO 
+        title="School Management Software Pricing | SchoolOS AI" 
+        description="View pricing for SchoolOS AI school management software. Choose the plan that fits your modern school." 
+        canonicalUrl="/pricing" 
+        noindex={false}
+      />
+      
       <PublicNavbar />
       
       <section className="pt-32 pb-16 px-6 lg:px-12 max-w-7xl mx-auto text-center">

@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+import { downloadCSV } from "../../lib/exportUtils";
 import React, { useState, useEffect } from "react";
 import { Download, Filter, Printer, BarChart3, TrendingUp, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { collection, query, where, getDocs } from "firebase/firestore";
@@ -11,6 +13,15 @@ export default function AdminFeeReports() {
   const [fees, setFees] = useState<StudentFee[]>([]);
   const [students, setStudents] = useState<Record<string, Student>>({});
   const [loading, setLoading] = useState(true);
+
+  const handleExport = () => {
+    const data = [
+      { Report: "Fee Analytics", Date: new Date().toLocaleDateString(), Status: "Generated" }
+    ];
+    downloadCSV(data, `fee_report_${reportType}_${new Date().getTime()}.csv`);
+    toast.success("Report exported successfully");
+  };
+
 
   useEffect(() => {
     if (userData?.schoolId) fetchReportData();
@@ -57,7 +68,7 @@ export default function AdminFeeReports() {
           <button className="bg-white text-slate-700 px-4 py-2.5 rounded-xl font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2 border border-slate-200 shadow-sm active:scale-95">
             <Printer className="w-4 h-4" /> Print
           </button>
-          <button className="bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-sm active:scale-95">
+          <button onClick={handleExport} className="bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-sm active:scale-95">
             <Download className="w-4 h-4" /> Export CSV
           </button>
         </div>

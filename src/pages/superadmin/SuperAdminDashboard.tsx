@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
-import { collection, getDocs, addDoc, doc, updateDoc, query } from "firebase/firestore";
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query } from "firebase/firestore";
 import { School, UserRole } from "../../types";
 import { Building2, Settings, Users, Activity, Check, Plus, Edit } from "lucide-react";
 import toast from "react-hot-toast";
@@ -75,15 +75,23 @@ export default function SuperAdminDashboard() {
         academicYear: formData.academicYear,
         createdAt: new Date().toISOString()
       };
-      const schoolRef = await addDoc(collection(db, "schools"), newSchool);
-      
-      // Create Principal Account in Auth & Firestore Users collection
-      // For MVP we use a default password "password123", they can reset it later.
-      await createAccountSecurely(formData.principalEmail, {
-        name: formData.principalName,
-        role: "ADMIN",
-        schoolId: schoolRef.id
-      });
+      let schoolRef;
+      try {
+        schoolRef = await addDoc(collection(db, "schools"), newSchool);
+        
+        // Create Principal Account in Auth & Firestore Users collection
+        // For MVP we use a default password "password123", they can reset it later.
+        await createAccountSecurely(formData.principalEmail, {
+          name: formData.principalName,
+          role: "ADMIN",
+          schoolId: schoolRef.id
+        });
+      } catch (authError: any) {
+        if (schoolRef) {
+          await deleteDoc(doc(db, "schools", schoolRef.id));
+        }
+        throw authError;
+      }
       
       toast.success("School and Principal account created successfully. Activation email sent.");
       

@@ -1,6 +1,8 @@
 {
-  "name": "",
-  "description": "",
+  "name": "SchoolOS AI — School Management Platform",
+  "description": "SchoolOS AI is a modern school management platform for principals, teachers, and parents.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

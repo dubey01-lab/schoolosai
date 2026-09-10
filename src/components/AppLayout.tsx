@@ -1,4 +1,5 @@
 import React from "react";
+import { SEO } from "./SEO";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
 import { 
@@ -26,13 +27,14 @@ const adminLinks = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
   { name: "Students", icon: Users, href: "/admin/students" },
   { name: "Teachers", icon: GraduationCap, href: "/admin/teachers" },
+  { name: "Classes", icon: FileText, href: "/admin/classes" },
   { name: "Attendance", icon: CalendarCheck, href: "/admin/attendance" },
   { name: "Fees", icon: CreditCard, href: "/admin/fees" },
   { name: "Homework", icon: BookOpen, href: "/admin/homework" },
   { name: "Exams & Results", icon: FileText, href: "/admin/exams" },
   { name: "Notices", icon: Bell, href: "/admin/notices" },
   { name: "Admissions", icon: UserPlus, href: "/admin/admissions" },
-  { name: "Complaints", icon: MessageSquare, href: "/admin/complaints" },
+  { name: "Support", icon: MessageSquare, href: "/admin/support" },
   { name: "AI Assistant", icon: Sparkles, href: "/admin/ai" },
   { name: "Reports", icon: BarChart, href: "/admin/reports" },
   { name: "Settings", icon: Settings, href: "/admin/settings" },
@@ -56,6 +58,8 @@ const parentLinks = [
 
 const superAdminLinks = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/superadmin/dashboard" },
+  { name: "Enquiries", icon: MessageSquare, href: "/superadmin/enquiries" },
+  { name: "Support Tickets", icon: FileText, href: "/superadmin/support" },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -76,6 +80,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
+      <SEO title="SchoolOS AI Dashboard" description="SchoolOS AI Dashboard" noindex={true} />
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {mobileOpen && (

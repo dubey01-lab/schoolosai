@@ -48,7 +48,7 @@ service cloud.firestore {
       allow update, delete: if isAdmin() && request.resource.data.get('schoolId', null) == getUserSchoolId() && request.resource.data.get('role', '') != 'SUPER_ADMIN';
       
       // Allow initial setup: user can create their own profile
-      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && request.auth.uid == userId && request.resource.data.get('role', '') != 'SUPER_ADMIN';
       allow create: if isSuperAdmin();
       allow create: if isAdmin() && request.resource.data.get('schoolId', null) == getUserSchoolId() && request.resource.data.get('role', '') != 'SUPER_ADMIN';
     }
@@ -58,8 +58,9 @@ service cloud.firestore {
       allow read: if isSuperAdmin();
       allow read: if belongsToSchool(schoolId);
       
-      allow write: if isSuperAdmin();
-      allow write: if isAdmin() && belongsToSchool(schoolId);
+      allow create, delete: if isSuperAdmin();
+      allow update: if isSuperAdmin();
+      allow update: if isAdmin() && belongsToSchool(schoolId);
     }
 
     // --- ENQUIRIES ---
@@ -185,5 +186,12 @@ service cloud.firestore {
       allow read: if belongsToSchool(resource.data.get('schoolId', null));
       allow write: if belongsToSchool(request.resource.data.get('schoolId', null));
     }
+
+    // --- SUPPORT ---
+    match /support/{supportId} {
+      allow read: if isSuperAdmin() || (isSignedIn() && resource.data.get('schoolId', null) == getUserSchoolId());
+      allow write: if isSuperAdmin() || (isSignedIn() && request.resource.data.get('schoolId', null) == getUserSchoolId());
+    }
   }
 }
+

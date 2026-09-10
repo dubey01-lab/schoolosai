@@ -8,6 +8,13 @@ import { StudentFee, FeeTransaction, Student } from "../../types";
 export default function ParentFees() {
   const { userData } = useAuth();
   const [loading, setLoading] = useState(true);
+
+  const handlePrint = (txn: FeeTransaction) => {
+    // In a real app we would navigate to a dedicated receipt view or generate a PDF.
+    // For now, we will just use window.print()
+    window.print();
+  };
+
   const [myChildren, setMyChildren] = useState<Student[]>([]);
   const [fees, setFees] = useState<(StudentFee & { studentName?: string })[]>([]);
   const [transactions, setTransactions] = useState<(FeeTransaction & { feeName?: string })[]>([]);
@@ -166,7 +173,7 @@ export default function ParentFees() {
                     <td className="px-6 py-4 font-bold text-slate-900">₹{txn.totalPayable.toLocaleString()}</td>
                     <td className="px-6 py-4 text-slate-600">{txn.paymentMethod}</td>
                     <td className="px-6 py-4 text-right">
-                      <button className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                      <button onClick={() => handlePrint(txn as any)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
                         <Download className="w-4 h-4" />
                       </button>
                     </td>

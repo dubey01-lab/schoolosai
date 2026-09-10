@@ -1,4 +1,5 @@
 import React from "react";
+import { SEO } from "../../components/SEO";
 import { Link } from "react-router-dom";
 import { LayoutDashboard, GraduationCap, Users, Settings } from "lucide-react";
 import { PublicNavbar } from "../../components/public/PublicNavbar";
@@ -42,6 +43,13 @@ export default function SolutionsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 flex flex-col">
+      <SEO 
+        title="School Management Solutions for Schools | SchoolOS AI" 
+        description="SchoolOS AI provides dedicated solutions for principals, teachers, and parents to stay connected and efficiently manage school workflows." 
+        canonicalUrl="/solutions" 
+        noindex={false}
+      />
+      
       <PublicNavbar />
       
       <section className="pt-32 pb-16 px-6 lg:px-12 max-w-7xl mx-auto text-center">

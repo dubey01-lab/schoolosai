@@ -21,6 +21,11 @@ export default function TeacherClassDetails() {
   const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split("T")[0]);
   const [attendanceState, setAttendanceState] = useState<Record<string, "PRESENT" | "ABSENT" | "LATE" | "HALF_DAY">>({});
   const [savingAttendance, setSavingAttendance] = useState(false);
+
+  const [exams, setExams] = useState<any[]>([]);
+  const [selectedExam, setSelectedExam] = useState<any | null>(null);
+  const [results, setResults] = useState<Record<string, any>>({});
+
   
   const [homeworkList, setHomeworkList] = useState<Homework[]>([]);
   const [newHomework, setNewHomework] = useState({ title: "", description: "", dueDate: "" });
@@ -360,7 +365,7 @@ export default function TeacherClassDetails() {
               <h3 className="text-lg font-bold text-slate-800">Results Management</h3>
               <p className="text-slate-500 mt-2 max-w-md mx-auto">
                 Select an exam created by the administrator to enter marks for this class. 
-                Coming soon in the next update.
+                Results management is available for administrators in this version. Please contact your admin.
               </p>
             </div>
           )}

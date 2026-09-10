@@ -280,3 +280,46 @@ export interface Subject {
   createdAt: string;
   createdBy: string;
 }
+
+export interface SupportTicket {
+  id?: string;
+  schoolId: string;
+  subject: string;
+  category: "TECHNICAL" | "ACCOUNT" | "STUDENT" | "TEACHER" | "FEES" | "ATTENDANCE" | "HOMEWORK" | "RESULTS" | "GENERAL";
+  priority: "LOW" | "MEDIUM" | "HIGH";
+  message: string;
+  status: "OPEN" | "IN_PROGRESS" | "WAITING_FOR_USER" | "RESOLVED" | "CLOSED";
+  createdBy: string;
+  createdByRole: string;
+  createdAt: string;
+  updatedAt: string;
+  resolution?: string;
+  messages?: SupportMessage[];
+}
+
+export interface SupportMessage {
+  id: string;
+  senderId: string;
+  senderRole: string;
+  message: string;
+  createdAt: string;
+}
+
+export interface PlatformEnquiry {
+  id?: string;
+  source: "CONTACT" | "BOOK_DEMO";
+  name: string;
+  email: string;
+  phone?: string;
+  schoolName?: string;
+  country?: string;
+  city?: string;
+  role?: string;
+  studentCount?: string;
+  preferredContactMethod?: string;
+  subject?: string;
+  message: string;
+  status: "NEW" | "CONTACTED" | "DEMO_SCHEDULED" | "CONVERTED" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+  createdAt: string;
+  notes?: string;
+}
