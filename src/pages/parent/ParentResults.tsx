@@ -67,6 +67,10 @@ export default function ParentResults() {
     fetchResults();
   }, [selectedChildId, userData]);
 
+  
+  const handlePrint = (resultId: string) => {
+    window.print();
+  };
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -109,7 +113,7 @@ export default function ParentResults() {
                   <h3 className="text-lg font-bold text-slate-900">{result.examDetails?.title || "Examination"}</h3>
                   <p className="text-sm text-slate-500 mt-1">Held on {result.examDetails ? new Date(result.examDetails.date).toLocaleDateString() : "Unknown date"}</p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-medium text-sm hover:bg-slate-50 transition-colors">
+                <button onClick={() => handlePrint(result.id)} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-medium text-sm hover:bg-slate-50 transition-colors">
                   <Download className="w-4 h-4" /> Print
                 </button>
               </div>

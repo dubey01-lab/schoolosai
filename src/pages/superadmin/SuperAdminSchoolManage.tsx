@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Building2, User, Phone, Mail, MapPin, Loader2, Calendar } from "lucide-react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import toast from "react-hot-toast";
 import { db } from "../../lib/firebase";
@@ -33,6 +33,23 @@ export default function SuperAdminSchoolManage() {
     };
     fetchSchool();
   }, [schoolId]);
+
+  
+  const handleToggleSuspend = async () => {
+    if (!school || !school.id) return;
+    const newStatus = school.status === 'SUSPENDED' ? 'ACTIVE' : 'SUSPENDED';
+    if (!window.confirm(`Are you sure you want to ${newStatus === 'SUSPENDED' ? 'suspend' : 'activate'} this school? Teachers and parents will still have access, but the principal will be locked out until activated.`)) return;
+    
+    try {
+      const docRef = doc(db, "schools", school.id);
+      await updateDoc(docRef, { status: newStatus });
+      setSchool({ ...school, status: newStatus });
+      toast.success(`School successfully ${newStatus === 'SUSPENDED' ? 'suspended' : 'activated'}.`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update school status.");
+    }
+  };
 
   const handleResetPassword = async () => {
     if (!school) return;
@@ -130,16 +147,28 @@ export default function SuperAdminSchoolManage() {
               <Calendar className="w-5 h-5 text-emerald-500" /> Subscription & Status
             </h2>
             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 space-y-4">
-              <div>
+              
                 <p className="text-sm font-medium text-slate-500 mb-1">Current Status</p>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                  school.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' :
-                  school.status === 'EXPIRED' ? 'bg-amber-100 text-amber-700' :
-                  'bg-rose-100 text-rose-700'
-                }`}>
-                  {school.status}
-                </span>
-              </div>
+                <div className="flex items-center justify-between">
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                    school.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' :
+                    school.status === 'EXPIRED' ? 'bg-amber-100 text-amber-700' :
+                    'bg-rose-100 text-rose-700'
+                  }`}>
+                    {school.status}
+                  </span>
+                  <button
+                    onClick={handleToggleSuspend}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-colors ${
+                      school.status === 'SUSPENDED'
+                        ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'
+                        : 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100'
+                    }`}
+                  >
+                    {school.status === 'SUSPENDED' ? 'Activate School' : 'Suspend School'}
+                  </button>
+                </div>
+
               <div>
                 <p className="text-sm font-medium text-slate-500 mb-1">Subscription Plan</p>
                 <p className="font-semibold text-slate-900">{school.plan}</p>

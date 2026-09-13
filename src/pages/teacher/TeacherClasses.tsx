@@ -16,12 +16,23 @@ export default function TeacherClasses() {
     const fetchClasses = async () => {
       if (!userData?.uid || !userData?.schoolId) return;
       try {
-        const teacherDoc = await getDoc(doc(db, "teachers", userData.uid));
+        
         let tData: Teacher | null = null;
+        const teacherDoc = await getDoc(doc(db, "teachers", userData.uid));
         if (teacherDoc.exists()) {
           tData = { id: teacherDoc.id, ...teacherDoc.data() } as Teacher;
+        } else {
+          const tQ = query(collection(db, "teachers"), where("email", "==", userData.email), where("schoolId", "==", userData.schoolId));
+          const tSnap = await getDocs(tQ);
+          if (!tSnap.empty) {
+            tData = { id: tSnap.docs[0].id, ...tSnap.docs[0].data() } as Teacher;
+          }
+        }
+        
+        if (tData) {
           setTeacher(tData);
         }
+
 
         if (tData?.classes && tData.classes.length > 0) {
           const counts: Record<string, number> = {};

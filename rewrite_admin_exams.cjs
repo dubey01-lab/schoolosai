@@ -1,4 +1,9 @@
+const fs = require('fs');
 
+let content = fs.readFileSync('src/pages/admin/AdminExams.tsx', 'utf-8');
+
+// The new AdminExams with Marks Entry modal
+const newContent = `
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
@@ -171,11 +176,11 @@ export default function AdminExams() {
                 <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
                   <FileText className="w-6 h-6" />
                 </div>
-                <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                <span className={\`px-2.5 py-1 rounded-full text-xs font-bold \${
                   exam.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' :
                   exam.status === 'SCHEDULED' ? 'bg-amber-100 text-amber-700' :
                   'bg-slate-100 text-slate-700'
-                }`}>
+                }\`}>
                   {exam.status}
                 </span>
               </div>
@@ -326,3 +331,6 @@ export default function AdminExams() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/pages/admin/AdminExams.tsx', newContent);

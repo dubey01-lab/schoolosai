@@ -75,7 +75,7 @@ export default function ParentDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <Link to="/parent/fees" className="bg-white p-6 rounded-3xl border border-indigo-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group relative overflow-hidden">
            <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500"></div>
            <div className="flex items-start justify-between mb-4">
@@ -119,6 +119,17 @@ export default function ParentDashboard() {
            <h3 className="text-sm font-medium text-slate-500">Homework</h3>
            <p className="text-2xl font-bold text-slate-900 mt-1">{homeworkCount}</p>
            <p className="text-xs font-medium text-blue-600 mt-2">Pending assignments</p>
+        </Link>
+
+        <Link to="/parent/results" className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
+           <div className="flex items-start justify-between mb-4">
+             <div className="w-12 h-12 rounded-2xl bg-fuchsia-50 text-fuchsia-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+               <FileText className="w-6 h-6" />
+             </div>
+           </div>
+           <h3 className="text-sm font-medium text-slate-500">Results</h3>
+           <p className="text-2xl font-bold text-slate-900 mt-1">View Marks</p>
+           <p className="text-xs font-medium text-fuchsia-600 mt-2">Latest exams</p>
         </Link>
       </div>
       

@@ -36,11 +36,23 @@ export default function TeacherClassDetails() {
       if (!userData?.uid || !userData?.schoolId || !classId) return;
       
       try {
-        const teacherDoc = await getDoc(doc(db, "teachers", userData.uid));
-        if (!teacherDoc.exists()) throw new Error("Teacher not found");
         
-        const tData = { id: teacherDoc.id, ...teacherDoc.data() } as Teacher;
+        let tData: Teacher | null = null;
+        const teacherDoc = await getDoc(doc(db, "teachers", userData.uid));
+        if (teacherDoc.exists()) {
+          tData = { id: teacherDoc.id, ...teacherDoc.data() } as Teacher;
+        } else {
+          const tQ = query(collection(db, "teachers"), where("email", "==", userData.email), where("schoolId", "==", userData.schoolId));
+          const tSnap = await getDocs(tQ);
+          if (!tSnap.empty) {
+            tData = { id: tSnap.docs[0].id, ...tSnap.docs[0].data() } as Teacher;
+          }
+        }
+        
+        if (!tData) throw new Error("Teacher not found");
+        
         setTeacher(tData);
+
         
         if (!tData.classes?.includes(classId)) {
           toast.error("You are not assigned to this class");
@@ -72,6 +84,17 @@ export default function TeacherClassDetails() {
         const hwSnap = await getDocs(hwQ);
         setHomeworkList(hwSnap.docs.map(d => ({ id: d.id, ...d.data() } as Homework)).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
         
+        
+        // Fetch Exams
+        const examQ = query(
+          collection(db, "exams"),
+          where("schoolId", "==", userData.schoolId),
+          where("class", "==", className.trim()),
+          where("section", "==", section.trim())
+        );
+        const examSnap = await getDocs(examQ);
+        setExams(examSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+
         // Set default attendance state
         const initialAtt: Record<string, "PRESENT" | "ABSENT" | "LATE" | "HALF_DAY"> = {};
         sData.forEach(s => { if (s.id) initialAtt[s.id] = "PRESENT"; });
@@ -87,6 +110,60 @@ export default function TeacherClassDetails() {
 
     fetchClassData();
   }, [userData, classId, navigate]);
+
+  
+  const [marksData, setMarksData] = useState({});
+  const handleSaveResults = async () => {
+    if (!userData?.schoolId || !selectedExam || !classId) return;
+    setSavingAttendance(true); // Reusing state just for loading indicator
+    try {
+      // Format data and save
+      for (const student of students) {
+         if (marksData[student.id]) {
+            const marks = marksData[student.id];
+            // Calculate total, percentage, grade
+            let total = 0;
+            let maxTotal = 0;
+            const maxMarks = {};
+            
+            Object.entries(marks).forEach(([subject, mark]) => {
+                total += Number(mark);
+                maxTotal += 100; // Defaulting max marks to 100 per subject
+                maxMarks[subject] = 100;
+            });
+            
+            const percentage = (total / maxTotal) * 100;
+            let grade = "F";
+            if (percentage >= 90) grade = "A+";
+            else if (percentage >= 80) grade = "A";
+            else if (percentage >= 70) grade = "B";
+            else if (percentage >= 60) grade = "C";
+            else if (percentage >= 50) grade = "D";
+
+            // Save to 'results'
+            await addDoc(collection(db, "results"), {
+              schoolId: userData.schoolId,
+              studentId: student.id,
+              examId: selectedExam.id,
+              marks: marks,
+              maxMarks: maxMarks,
+              total,
+              percentage: percentage.toFixed(2),
+              grade,
+              createdAt: new Date().toISOString()
+            });
+         }
+      }
+      toast.success("Results saved successfully!");
+      setMarksData({});
+      setSelectedExam(null);
+    } catch (err) {
+       console.error(err);
+       toast.error("Failed to save results");
+    } finally {
+       setSavingAttendance(false);
+    }
+  };
 
   const handleSaveAttendance = async () => {
     if (!userData?.schoolId || !userData?.uid || !classId) return;
@@ -359,16 +436,84 @@ export default function TeacherClassDetails() {
             </div>
           )}
 
+
           {activeTab === 'RESULTS' && (
-            <div className="text-center p-12">
-              <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-slate-800">Results Management</h3>
-              <p className="text-slate-500 mt-2 max-w-md mx-auto">
-                Select an exam created by the administrator to enter marks for this class. 
-                Results management is available for administrators in this version. Please contact your admin.
-              </p>
+            <div className="space-y-6">
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+                    <h3 className="text-lg font-bold text-slate-800">Results Entry</h3>
+                    <select 
+                       className="px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                       onChange={(e) => {
+                          const ex = exams.find(x => x.id === e.target.value);
+                          setSelectedExam(ex || null);
+                       }}
+                       value={selectedExam?.id || ""}
+                    >
+                       <option value="">Select Exam</option>
+                       {exams.map(ex => <option key={ex.id} value={ex.id}>{ex.title} - {new Date(ex.date).toLocaleDateString()}</option>)}
+                    </select>
+                </div>
+                
+                {selectedExam ? (
+                    <div className="space-y-4">
+                        <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
+                           <table className="w-full text-left">
+                              <thead className="bg-slate-50 border-b border-slate-200">
+                                 <tr className="text-sm font-medium text-slate-500">
+                                    <th className="px-4 py-3">Student</th>
+                                    <th className="px-4 py-3">Roll No</th>
+                                    {selectedExam.subjects.map((sub: string) => (
+                                        <th key={sub} className="px-4 py-3">{sub} (Max 100)</th>
+                                    ))}
+                                 </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                 {students.map(student => (
+                                    <tr key={student.id}>
+                                       <td className="px-4 py-3 font-medium text-slate-900">{student.name}</td>
+                                       <td className="px-4 py-3 text-slate-500">{student.rollNumber}</td>
+                                       {selectedExam.subjects.map((sub: string) => (
+                                          <td key={sub} className="px-4 py-3">
+                                             <input 
+                                                type="number" 
+                                                min="0" max="100"
+                                                className="w-20 px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                value={(marksData as any)[student.id!]?.[sub] || ''}
+                                                onChange={(e) => {
+                                                   setMarksData(prev => ({
+                                                      ...prev,
+                                                      [student.id!]: {
+                                                         ...((prev as any)[student.id!] || {}),
+                                                         [sub]: e.target.value
+                                                      }
+                                                   }));
+                                                }}
+                                             />
+                                          </td>
+                                       ))}
+                                    </tr>
+                                 ))}
+                              </tbody>
+                           </table>
+                        </div>
+                        <div className="flex justify-end mt-4">
+                           <button onClick={handleSaveResults} disabled={savingAttendance} className="px-6 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50">
+                              {savingAttendance ? "Saving..." : "Save Marks"}
+                           </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-center p-8">
+                       <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                       <p className="text-slate-500">Please select an exam to enter marks.</p>
+                       {exams.length === 0 && <p className="text-sm text-amber-600 mt-2">No exams found for this class.</p>}
+                    </div>
+                )}
+              </div>
             </div>
           )}
+    
         </div>
       </div>
     </div>

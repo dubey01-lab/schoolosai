@@ -31,6 +31,8 @@ import AdminSettingsNotifications from "./pages/admin/AdminSettingsNotifications
 import AdminNoticesAnalytics from "./pages/admin/AdminNoticesAnalytics";
 import ParentNotices from "./pages/parent/ParentNotices";
 import TeacherNotices from "./pages/teacher/TeacherNotices";
+import TeacherAttendance from "./pages/teacher/TeacherAttendance";
+import TeacherHomework from "./pages/teacher/TeacherHomework";
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import TeacherClasses from "./pages/teacher/TeacherClasses";
 import TeacherClassDetails from "./pages/teacher/TeacherClassDetails";
@@ -47,11 +49,14 @@ import ParentHomework from "./pages/parent/ParentHomework";
 import ParentResults from "./pages/parent/ParentResults";
 import AdminAdmissions from "./pages/admin/AdminAdmissions";
 import AdminReports from "./pages/admin/AdminReports";
+import AdminHomework from "./pages/admin/AdminHomework";
+import AdminSettings from "./pages/admin/AdminSettings";
 import AdminClasses from "./pages/admin/AdminClasses";
 import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
 import SuperAdminSchoolManage from "./pages/superadmin/SuperAdminSchoolManage";
 import SuperAdminLogin from "./pages/superadmin/SuperAdminLogin";
 import AdminSupport from "./pages/admin/AdminSupport";
+import { AdminSuspensionGuard } from "./components/AdminSuspensionGuard";
 import SuperAdminEnquiries from "./pages/superadmin/SuperAdminEnquiries";
 import SuperAdminSupport from "./pages/superadmin/SuperAdminSupport";
 
@@ -98,14 +103,16 @@ function AppRoutes() {
               <Route path="support" element={<SuperAdminSupport />} />
               <Route path="*" element={<div className="p-8 text-center text-slate-500">Page Not Found</div>} />
             </Routes>
-          </AppLayout>
+            </AppLayout>
+          
         </ProtectedRoute>
       } />
       
       {/* Admin Routes */}
       <Route path="/admin/*" element={
         <ProtectedRoute allowedRoles={["ADMIN"]}>
-          <AppLayout>
+          <AdminSuspensionGuard>
+            <AppLayout>
             <Routes>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="teachers" element={<AdminTeachers />} />
@@ -116,6 +123,8 @@ function AppRoutes() {
               <Route path="admissions" element={<AdminAdmissions />} />
               <Route path="support" element={<AdminSupport />} />
               <Route path="reports" element={<AdminReports />} />
+              <Route path="homework" element={<AdminHomework />} />
+              <Route path="settings" element={<AdminSettings />} />
               <Route path="classes" element={<AdminClasses />} />
               <Route path="ai" element={<AdminAI />} />
               <Route path="fees" element={<AdminFees />} />
@@ -132,10 +141,11 @@ function AppRoutes() {
               <Route path="settings/notifications" element={<AdminSettingsNotifications />} />
               <Route path="*" element={<div className="p-8 text-center text-slate-500">Page Not Found</div>} />
             </Routes>
-          </AppLayout>
+            </AppLayout>
+          </AdminSuspensionGuard>
         </ProtectedRoute>
       } />
-      
+            
       {/* Teacher Routes */}
       <Route path="/teacher/*" element={
         <ProtectedRoute allowedRoles={["TEACHER"]}>
@@ -145,6 +155,8 @@ function AppRoutes() {
               <Route path="classes" element={<TeacherClasses />} />
               <Route path="classes/:classId" element={<TeacherClassDetails />} />
               <Route path="notices" element={<TeacherNotices />} />
+              <Route path="attendance" element={<TeacherAttendance />} />
+              <Route path="homework" element={<TeacherHomework />} />
               <Route path="*" element={<div className="p-8 text-center text-slate-500">Page Not Found</div>} />
             </Routes>
           </AppLayout>

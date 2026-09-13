@@ -1,6 +1,8 @@
+import { downloadCSV } from "../../lib/exportUtils";
+import { Download } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { Plus, Search, Filter, Edit, Trash2, Users, Loader2 } from "lucide-react";
-import { collection, getDocs, addDoc, deleteDoc, doc, query, where } from "firebase/firestore";
+import { collection, getDocs, addDoc, deleteDoc, doc, setDoc, query, where } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../contexts/AuthContext";
 import { Teacher } from "../../types";
@@ -14,6 +16,22 @@ export default function AdminTeachers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  
+  const handleExport = () => {
+    if (teachers.length === 0) return toast.error("No teachers to export");
+    const data = teachers.map(t => ({
+      ID: t.id,
+      Name: t.name,
+      Email: t.email,
+      Phone: t.phone,
+      Subject: t.subject,
+      Qualification: t.qualification,
+      
+      JoinedAt: t.joiningDate
+    }));
+    downloadCSV(data, 'teachers_list.csv');
+  };
 
   useEffect(() => {
     fetchTeachers();
@@ -66,7 +84,7 @@ export default function AdminTeachers() {
       };
 
       // Create teacher profile
-      await addDoc(collection(db, "teachers"), newTeacher);
+      await setDoc(doc(db, "teachers", newUid), newTeacher);
       
       setTeachers([{ ...newTeacher } as Teacher, ...teachers]);
       setIsAddModalOpen(false);
@@ -103,12 +121,19 @@ export default function AdminTeachers() {
           <h2 className="text-2xl font-bold text-slate-800">Teachers</h2>
           <p className="text-slate-500 mt-1">Manage staff and teacher accounts.</p>
         </div>
-        <button 
-          onClick={() => setIsAddModalOpen(true)}
+        
+        <div className="flex gap-2">
+          <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors">
+             <Download className="w-5 h-5" /> Export
+          </button>
+          <button 
+            onClick={() => setIsAddModalOpen(true)}
+
           className="bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2 active:scale-95"
         >
           <Plus className="w-5 h-5" /> Add Teacher
         </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
