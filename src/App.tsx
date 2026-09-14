@@ -34,6 +34,10 @@ import TeacherNotices from "./pages/teacher/TeacherNotices";
 import TeacherAttendance from "./pages/teacher/TeacherAttendance";
 import TeacherHomework from "./pages/teacher/TeacherHomework";
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
+import TeacherMarks from "./pages/teacher/TeacherMarks";
+import TeacherTimetable from "./pages/teacher/TeacherTimetable";
+import TeacherProgress from "./pages/teacher/TeacherProgress";
+import TeacherProfile from "./pages/teacher/TeacherProfile";
 import TeacherClasses from "./pages/teacher/TeacherClasses";
 import TeacherClassDetails from "./pages/teacher/TeacherClassDetails";
 import AdminFees from "./pages/admin/AdminFees";
@@ -157,6 +161,10 @@ function AppRoutes() {
               <Route path="notices" element={<TeacherNotices />} />
               <Route path="attendance" element={<TeacherAttendance />} />
               <Route path="homework" element={<TeacherHomework />} />
+              <Route path="marks" element={<TeacherMarks />} />
+              <Route path="timetable" element={<TeacherTimetable />} />
+              <Route path="progress" element={<TeacherProgress />} />
+              <Route path="profile" element={<TeacherProfile />} />
               <Route path="*" element={<div className="p-8 text-center text-slate-500">Page Not Found</div>} />
             </Routes>
           </AppLayout>

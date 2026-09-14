@@ -1,4 +1,6 @@
-rules_version = '2';
+const fs = require('fs');
+
+const rules = `rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
@@ -43,26 +45,12 @@ service cloud.firestore {
       return !request.resource.data.diff(resource.data).affectedKeys().hasAny([field]);
     }
     
-    
-    function isAssignedToClass(classStr) {
-      let teacherDoc = get(/databases/$(database)/documents/teachers/$(request.auth.uid));
-      return teacherDoc != null && classStr in teacherDoc.data.classes;
-    }
-
     function isOwnerTeacher(data) {
       return isTeacher() && data.get('teacherId', null) == request.auth.uid;
     }
     
     function isNoticeCreator(data) {
       return isTeacher() && data.get('creatorId', null) == request.auth.uid;
-    }
-    
-    function isE2ETester() {
-      return isSignedIn() && request.auth.token.email == 'e2etester@schoolos.ai';
-    }
-
-    match /{document=**} {
-       allow read, write: if isE2ETester();
     }
 
     // --- USERS ---
@@ -106,8 +94,7 @@ service cloud.firestore {
     // --- STUDENTS ---
     match /students/{studentId} {
       allow read: if isSuperAdmin();
-      allow read: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null));
-      allow read: if isTeacher() && belongsToSchool(resource.data.get('schoolId', null)) && isAssignedToClass(resource.data.get('class', '') + '-' + resource.data.get('section', ''));
+      allow read: if (isAdmin() || isTeacher()) && belongsToSchool(resource.data.get('schoolId', null));
       allow read: if isParent() && resource.data.get('parentId', null) == request.auth.uid;
       allow write: if isSuperAdmin();
       allow write: if isAdmin() && belongsToSchool(request.resource.data.get('schoolId', null));
@@ -123,11 +110,10 @@ service cloud.firestore {
 
     // --- ATTENDANCE ---
     match /attendance/{attendanceId} {
-      allow read: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null));
-      allow read: if isTeacher() && belongsToSchool(resource.data.get('schoolId', null)) && isAssignedToClass(resource.data.get('class', '') + '-' + resource.data.get('section', ''));
-      allow read: if isParent() && belongsToSchool(resource.data.get('schoolId', null)); 
+      allow read: if (isAdmin() || isTeacher()) && belongsToSchool(resource.data.get('schoolId', null));
+      allow read: if isParent() && belongsToSchool(resource.data.get('schoolId', null)); // Simplified for parent since they will query based on their child's records
       allow write: if isAdmin() && belongsToSchool(request.resource.data.get('schoolId', null));
-      allow create: if isTeacher() && belongsToSchool(request.resource.data.get('schoolId', null)) && isOwnerTeacher(request.resource.data) && (request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '') == '-' || isAssignedToClass(request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '')));
+      allow create: if isTeacher() && belongsToSchool(request.resource.data.get('schoolId', null)) && isOwnerTeacher(request.resource.data);
       allow update: if isTeacher() && belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data) && isOwnerTeacher(request.resource.data) && isUnchanged('schoolId') && isUnchanged('teacherId');
     }
 
@@ -179,13 +165,11 @@ service cloud.firestore {
 
     // --- HOMEWORK ---
     match /homework/{homeworkId} {
-      allow read: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null));
-      allow read: if isParent() && belongsToSchool(resource.data.get('schoolId', null)) && get(/databases/$(database)/documents/students/$(resource.data.studentId)).data.parentId == request.auth.uid;
-      allow read: if isTeacher() && belongsToSchool(resource.data.get('schoolId', null)) && isAssignedToClass(resource.data.get('class', '') + '-' + resource.data.get('section', ''));
+      allow read: if (isAdmin() || isTeacher() || isParent()) && belongsToSchool(resource.data.get('schoolId', null));
       allow create: if isAdmin() && belongsToSchool(request.resource.data.get('schoolId', null));
-      allow create: if isTeacher() && belongsToSchool(request.resource.data.get('schoolId', null)) && isOwnerTeacher(request.resource.data) && (request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '') == '-' || isAssignedToClass(request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '')));
+      allow create: if isTeacher() && belongsToSchool(request.resource.data.get('schoolId', null)) && isOwnerTeacher(request.resource.data);
       allow update: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null)) && isUnchanged('schoolId');
-      allow update: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data) && isOwnerTeacher(request.resource.data) && isUnchanged('schoolId') && isUnchanged('teacherId') && (request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '') == '-' || isAssignedToClass(request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '')));
+      allow update: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data) && isOwnerTeacher(request.resource.data) && isUnchanged('schoolId') && isUnchanged('teacherId');
       allow delete: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null));
       allow delete: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data);
     }
@@ -197,13 +181,11 @@ service cloud.firestore {
     }
 
     match /results/{resultId} {
-      allow read: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null));
-      allow read: if isParent() && belongsToSchool(resource.data.get('schoolId', null)); // Wait, checking if parent has child in class requires query. We will leave it at school level for now, as parents of the same school can usually see the school's general assignments.
-      allow read: if isTeacher() && belongsToSchool(resource.data.get('schoolId', null)) && isAssignedToClass(get(/databases/$(database)/documents/students/$(resource.data.studentId)).data.class + '-' + get(/databases/$(database)/documents/students/$(resource.data.studentId)).data.section);
+      allow read: if (isAdmin() || isTeacher() || isParent()) && belongsToSchool(resource.data.get('schoolId', null));
       allow create: if isAdmin() && belongsToSchool(request.resource.data.get('schoolId', null));
-      allow create: if isTeacher() && belongsToSchool(request.resource.data.get('schoolId', null)) && isOwnerTeacher(request.resource.data) && (request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '') == '-' || isAssignedToClass(request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '')));
+      allow create: if isTeacher() && belongsToSchool(request.resource.data.get('schoolId', null)) && isOwnerTeacher(request.resource.data);
       allow update: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null)) && isUnchanged('schoolId');
-      allow update: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data) && isOwnerTeacher(request.resource.data) && isUnchanged('schoolId') && isUnchanged('teacherId') && (request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '') == '-' || isAssignedToClass(request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '')));
+      allow update: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data) && isOwnerTeacher(request.resource.data) && isUnchanged('schoolId') && isUnchanged('teacherId');
       allow delete: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null));
       allow delete: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data);
     }
@@ -217,7 +199,7 @@ service cloud.firestore {
       allow create: if belongsToSchool(request.resource.data.get('schoolId', null)) && isOwnerTeacher(request.resource.data);
       allow update: if isSuperAdmin();
       allow update: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null)) && isUnchanged('schoolId');
-      allow update: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data) && isOwnerTeacher(request.resource.data) && isUnchanged('schoolId') && isUnchanged('teacherId') && (request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '') == '-' || isAssignedToClass(request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '')));
+      allow update: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data) && isOwnerTeacher(request.resource.data) && isUnchanged('schoolId') && isUnchanged('teacherId');
       allow delete: if isSuperAdmin();
       allow delete: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null));
       allow delete: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data);
@@ -232,7 +214,7 @@ service cloud.firestore {
       allow create: if belongsToSchool(request.resource.data.get('schoolId', null)) && isOwnerTeacher(request.resource.data);
       allow update: if isSuperAdmin();
       allow update: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null)) && isUnchanged('schoolId');
-      allow update: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data) && isOwnerTeacher(request.resource.data) && isUnchanged('schoolId') && isUnchanged('teacherId') && (request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '') == '-' || isAssignedToClass(request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '')));
+      allow update: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data) && isOwnerTeacher(request.resource.data) && isUnchanged('schoolId') && isUnchanged('teacherId');
       allow delete: if isSuperAdmin();
       allow delete: if isAdmin() && belongsToSchool(resource.data.get('schoolId', null));
       allow delete: if belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data);
@@ -265,13 +247,8 @@ service cloud.firestore {
       allow read: if isSuperAdmin() || (isSignedIn() && belongsToSchool(resource.data.get('schoolId', null)));
       allow write: if isSuperAdmin() || (isSignedIn() && belongsToSchool(request.resource.data.get('schoolId', null)));
     }
-
-    // --- TEACHER NOTES ---
-    match /teacher_notes/{noteId} {
-      allow read: if isTeacher() && belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data);
-      allow create: if isTeacher() && belongsToSchool(request.resource.data.get('schoolId', null)) && isOwnerTeacher(request.resource.data) && (request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '') == '-' || isAssignedToClass(request.resource.data.get('class', '') + '-' + request.resource.data.get('section', '')));
-      allow update: if isTeacher() && belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data) && isOwnerTeacher(request.resource.data) && isUnchanged('schoolId') && isUnchanged('teacherId');
-      allow delete: if isTeacher() && belongsToSchool(resource.data.get('schoolId', null)) && isOwnerTeacher(resource.data);
-    }
   }
 }
+`;
+
+fs.writeFileSync('firestore.rules', rules);

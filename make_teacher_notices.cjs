@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+const fs = require('fs');
+
+const content = `import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
-import { collection, query, where, getDocs, doc, getDoc, setDoc, deleteDoc , serverTimestamp } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { Bell, Search, Plus, Trash2, Edit2, X, Eye } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -94,10 +96,10 @@ export default function TeacherNotices() {
         targetClass: formData.audience === "CLASS" ? formData.targetClass : "",
         publishDate: formData.publishDate,
         status: formData.status || "PUBLISHED",
-        updatedAt: serverTimestamp()
+        updatedAt: new Date().toISOString()
       };
       if (formData.expiryDate) payload.expiryDate = formData.expiryDate;
-      if (!editingId) payload.createdAt = serverTimestamp();
+      if (!editingId) payload.createdAt = new Date().toISOString();
 
       await setDoc(doc(db, "notices", docId), payload, { merge: true });
       toast.success(editingId ? "Notice updated" : "Notice created");
@@ -136,7 +138,7 @@ export default function TeacherNotices() {
       const newStatus = n.status === "PUBLISHED" ? "UNPUBLISHED" : "PUBLISHED";
       await setDoc(doc(db, "notices", n.id!), { status: newStatus }, { merge: true });
       setNotices(prev => prev.map(x => x.id === n.id ? { ...x, status: newStatus } : x));
-      toast.success(`Notice ${newStatus.toLowerCase()}`);
+      toast.success(\`Notice \${newStatus.toLowerCase()}\`);
     } catch (err) {
       toast.error("Failed to update status");
     }
@@ -164,8 +166,8 @@ export default function TeacherNotices() {
       </div>
 
       <div className="flex border-b border-slate-200">
-        <button onClick={() => setActiveTab("MY_NOTICES")} className={`px-6 py-3 font-medium text-sm transition-colors ${activeTab === "MY_NOTICES" ? "border-b-2 border-indigo-600 text-indigo-700 bg-indigo-50/50" : "text-slate-500 hover:text-slate-700"}`}>My Notices</button>
-        <button onClick={() => setActiveTab("SCHOOL_NOTICES")} className={`px-6 py-3 font-medium text-sm transition-colors ${activeTab === "SCHOOL_NOTICES" ? "border-b-2 border-indigo-600 text-indigo-700 bg-indigo-50/50" : "text-slate-500 hover:text-slate-700"}`}>School Notices</button>
+        <button onClick={() => setActiveTab("MY_NOTICES")} className={\`px-6 py-3 font-medium text-sm transition-colors \${activeTab === "MY_NOTICES" ? "border-b-2 border-indigo-600 text-indigo-700 bg-indigo-50/50" : "text-slate-500 hover:text-slate-700"}\`}>My Notices</button>
+        <button onClick={() => setActiveTab("SCHOOL_NOTICES")} className={\`px-6 py-3 font-medium text-sm transition-colors \${activeTab === "SCHOOL_NOTICES" ? "border-b-2 border-indigo-600 text-indigo-700 bg-indigo-50/50" : "text-slate-500 hover:text-slate-700"}\`}>School Notices</button>
       </div>
 
       {showForm && activeTab === "MY_NOTICES" && (
@@ -233,7 +235,7 @@ export default function TeacherNotices() {
                   <div className="flex flex-col sm:flex-row justify-between gap-4 mb-2">
                     <h3 className="font-bold text-slate-900 text-lg">{n.title}</h3>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded-lg text-xs font-bold ${n.status === 'PUBLISHED' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>{n.status}</span>
+                      <span className={\`px-2 py-1 rounded-lg text-xs font-bold \${n.status === 'PUBLISHED' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}\`}>{n.status}</span>
                       <button onClick={() => toggleStatus(n)} className="p-1.5 text-slate-400 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-200 shadow-sm" title="Toggle Status"><Eye className="w-4 h-4" /></button>
                       <button onClick={() => handleEdit(n)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"><Edit2 className="w-4 h-4" /></button>
                       <button onClick={() => handleDelete(n.id!)} className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
@@ -241,7 +243,7 @@ export default function TeacherNotices() {
                   </div>
                   <p className="text-slate-600 text-sm whitespace-pre-wrap mb-3">{n.content}</p>
                   <div className="flex flex-wrap gap-3 text-xs font-medium text-slate-500">
-                    <span className="bg-slate-100 px-2 py-1 rounded-md">Audience: {n.audience === "CLASS" ? `Class ${n.targetClass}` : "All Students"}</span>
+                    <span className="bg-slate-100 px-2 py-1 rounded-md">Audience: {n.audience === "CLASS" ? \`Class \${n.targetClass}\` : "All Students"}</span>
                     <span className="bg-slate-100 px-2 py-1 rounded-md">Published: {new Date(n.publishDate).toLocaleDateString()}</span>
                     {n.expiryDate && <span className="bg-slate-100 px-2 py-1 rounded-md">Expires: {new Date(n.expiryDate).toLocaleDateString()}</span>}
                   </div>
@@ -275,3 +277,5 @@ export default function TeacherNotices() {
     </div>
   );
 }
+`;
+fs.writeFileSync('src/pages/teacher/TeacherNotices.tsx', content);

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+const fs = require('fs');
+
+const content = `import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
 import { collection, query, where, getDocs, doc, getDoc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
@@ -71,7 +73,7 @@ export default function TeacherHomework() {
   };
 
   const handleEdit = (hw: Homework) => {
-    setSelectedClassObj(`${hw.class}-${hw.section}`);
+    setSelectedClassObj(\`\${hw.class}-\${hw.section}\`);
     setFormSubject(hw.subject);
     setFormData({
       title: hw.title,
@@ -126,11 +128,11 @@ export default function TeacherHomework() {
         dueDate: formData.dueDate,
         priority: formData.priority || "Normal",
         status: formData.status || "PUBLISHED",
-        updatedAt: serverTimestamp()
+        updatedAt: new Date().toISOString()
       };
 
       if (!editingId) {
-        (payload as any).createdAt = serverTimestamp();
+        (payload as any).createdAt = new Date().toISOString();
       }
 
       await setDoc(doc(db, "homework", hwId), payload, { merge: true });
@@ -159,7 +161,7 @@ export default function TeacherHomework() {
 
   const filteredHomeworks = homeworks.filter(h => {
     const matchesSearch = h.title.toLowerCase().includes(searchTerm.toLowerCase()) || h.subject.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesClass = filterClass ? `${h.class}-${h.section}` === filterClass : true;
+    const matchesClass = filterClass ? \`\${h.class}-\${h.section}\` === filterClass : true;
     return matchesSearch && matchesClass;
   });
 
@@ -272,8 +274,8 @@ export default function TeacherHomework() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold">{hw.class}-{hw.section}</span>
                       <span className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-medium">{hw.subject}</span>
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${hw.priority === 'Urgent' ? 'bg-rose-50 text-rose-700' : hw.priority === 'Important' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}`}>{hw.priority || 'Normal'}</span>
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${hw.status === 'PUBLISHED' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>{hw.status}</span>
+                      <span className={\`px-2.5 py-1 rounded-lg text-xs font-bold \${hw.priority === 'Urgent' ? 'bg-rose-50 text-rose-700' : hw.priority === 'Important' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}\`}>{hw.priority || 'Normal'}</span>
+                      <span className={\`px-2.5 py-1 rounded-lg text-xs font-bold \${hw.status === 'PUBLISHED' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}\`}>{hw.status}</span>
                     </div>
                     <h4 className="text-lg font-bold text-slate-900">{hw.title}</h4>
                   </div>
@@ -295,3 +297,5 @@ export default function TeacherHomework() {
     </div>
   );
 }
+`;
+fs.writeFileSync('src/pages/teacher/TeacherHomework.tsx', content);

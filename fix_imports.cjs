@@ -1,15 +1,9 @@
 const fs = require('fs');
+let content = fs.readFileSync('src/pages/admin/AdminReports.tsx', 'utf-8');
 
-function fix(file) {
-    let content = fs.readFileSync(file, 'utf-8');
-    content = `import { downloadCSV } from "../../lib/exportUtils";\nimport { Download } from "lucide-react";\n` + content;
-    
-    // Fix the Typescript errors: dateOfBirth -> dob or just don't export it
-    content = content.replace(/DOB: s\.dateOfBirth,/g, '');
-    content = content.replace(/Experience: t\.experience,/g, '');
-    
-    fs.writeFileSync(file, content);
+if (!content.includes('downloadCSV')) {
+    console.log("No downloadCSV found!");
 }
 
-fix('src/pages/admin/AdminStudents.tsx');
-fix('src/pages/admin/AdminTeachers.tsx');
+content = `import { Download } from "lucide-react";\nimport { downloadCSV } from "../../lib/exportUtils";\n` + content;
+fs.writeFileSync('src/pages/admin/AdminReports.tsx', content);

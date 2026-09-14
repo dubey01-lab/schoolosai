@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+const fs = require('fs');
+
+const content = `import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
@@ -156,3 +158,5 @@ export default function TeacherClassDetails() {
     </div>
   );
 }
+`;
+fs.writeFileSync('src/pages/teacher/TeacherClassDetails.tsx', content);

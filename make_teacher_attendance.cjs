@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+const fs = require('fs');
+
+const content = `import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
-import { collection, query, where, getDocs, doc, getDoc, setDoc , serverTimestamp } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
 import { Student } from "../../types";
-import { CalendarCheck, Search, Check, X, Clock, UserMinus, Save, AlertCircle } from "lucide-react";
+import { CalendarCheck, Search, Check, X, Clock, UserMinus, Save } from "lucide-react";
 import toast from "react-hot-toast";
 
 type AttendanceStatus = "PRESENT" | "ABSENT" | "LATE" | "HALF_DAY";
@@ -60,23 +62,13 @@ export default function TeacherAttendance() {
       const sData = sSnap.docs.map(d => ({ id: d.id, ...d.data() } as Student)).sort((a,b) => (a.rollNumber || "").localeCompare(b.rollNumber || ""));
       setStudents(sData);
 
-      const attId = `${userData.schoolId}_${selectedClass}_${date}`;
+      const attId = \`\${userData.schoolId}_\${selectedClass}_\${date}\`;
       const attRef = doc(db, "attendance", attId);
-      let attSnap = null;
-      try {
-        attSnap = await getDoc(attRef);
-      } catch (err: any) {
-        if (err.code === "permission-denied" || err.message.includes("permission")) {
-          setErrorMsg("You do not have permission to access this data.");
-          setLoading(false);
-          return;
-        }
-        throw err;
-      }
+      const attSnap = await getDoc(attRef);
       
       const attObj: Record<string, { status: AttendanceStatus, remarks?: string }> = {};
       
-      if (attSnap && attSnap.exists()) {
+      if (attSnap.exists()) {
         const data = attSnap.data();
         if (data.records) {
           data.records.forEach((r: any) => {
@@ -139,7 +131,7 @@ export default function TeacherAttendance() {
         remarks: data.remarks || ""
       }));
 
-      const attId = `${userData.schoolId}_${selectedClass}_${date}`;
+      const attId = \`\${userData.schoolId}_\${selectedClass}_\${date}\`;
       await setDoc(doc(db, "attendance", attId), {
         schoolId: userData.schoolId,
         class: className,
@@ -147,7 +139,7 @@ export default function TeacherAttendance() {
         date: date,
         teacherId: teacher.id,
         records: records,
-        updatedAt: serverTimestamp()
+        updatedAt: new Date().toISOString()
       }, { merge: true });
 
       toast.success("Attendance saved successfully");
@@ -205,13 +197,7 @@ export default function TeacherAttendance() {
           </div>
         </div>
 
-        {errorMsg ? (
-        <div className="bg-white rounded-3xl border border-red-200 shadow-sm p-8 text-center text-red-600">
-          <AlertCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <h3 className="text-lg font-bold mb-1">Access Denied</h3>
-          <p>{errorMsg}</p>
-        </div>
-      ) : loading ? (
+        {loading ? (
           <div className="py-12 text-center text-slate-500">Loading students...</div>
         ) : !dataLoaded ? (
           <div className="py-12 text-center text-slate-500">Select a class and date to load attendance.</div>
@@ -276,22 +262,22 @@ export default function TeacherAttendance() {
                         <div className="flex items-center justify-center gap-1 sm:gap-2">
                           <button
                             onClick={() => handleStatusChange(student.id!, "PRESENT")}
-                            className={`p-2 rounded-lg flex items-center justify-center transition-colors ${attendanceState[student.id!]?.status === "PRESENT" ? "bg-emerald-500 text-white shadow-sm" : "bg-slate-100 text-slate-400 hover:bg-emerald-100 hover:text-emerald-600"}`}
+                            className={\`p-2 rounded-lg flex items-center justify-center transition-colors \${attendanceState[student.id!]?.status === "PRESENT" ? "bg-emerald-500 text-white shadow-sm" : "bg-slate-100 text-slate-400 hover:bg-emerald-100 hover:text-emerald-600"}\`}
                             title="Present"
                           ><Check className="w-4 h-4" /></button>
                           <button
                             onClick={() => handleStatusChange(student.id!, "ABSENT")}
-                            className={`p-2 rounded-lg flex items-center justify-center transition-colors ${attendanceState[student.id!]?.status === "ABSENT" ? "bg-rose-500 text-white shadow-sm" : "bg-slate-100 text-slate-400 hover:bg-rose-100 hover:text-rose-600"}`}
+                            className={\`p-2 rounded-lg flex items-center justify-center transition-colors \${attendanceState[student.id!]?.status === "ABSENT" ? "bg-rose-500 text-white shadow-sm" : "bg-slate-100 text-slate-400 hover:bg-rose-100 hover:text-rose-600"}\`}
                             title="Absent"
                           ><X className="w-4 h-4" /></button>
                           <button
                             onClick={() => handleStatusChange(student.id!, "LATE")}
-                            className={`p-2 rounded-lg flex items-center justify-center transition-colors ${attendanceState[student.id!]?.status === "LATE" ? "bg-amber-500 text-white shadow-sm" : "bg-slate-100 text-slate-400 hover:bg-amber-100 hover:text-amber-600"}`}
+                            className={\`p-2 rounded-lg flex items-center justify-center transition-colors \${attendanceState[student.id!]?.status === "LATE" ? "bg-amber-500 text-white shadow-sm" : "bg-slate-100 text-slate-400 hover:bg-amber-100 hover:text-amber-600"}\`}
                             title="Late"
                           ><Clock className="w-4 h-4" /></button>
                           <button
                             onClick={() => handleStatusChange(student.id!, "HALF_DAY")}
-                            className={`p-2 rounded-lg flex items-center justify-center transition-colors ${attendanceState[student.id!]?.status === "HALF_DAY" ? "bg-blue-500 text-white shadow-sm" : "bg-slate-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600"}`}
+                            className={\`p-2 rounded-lg flex items-center justify-center transition-colors \${attendanceState[student.id!]?.status === "HALF_DAY" ? "bg-blue-500 text-white shadow-sm" : "bg-slate-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600"}\`}
                             title="Leave"
                           ><UserMinus className="w-4 h-4" /></button>
                         </div>
@@ -327,3 +313,5 @@ export default function TeacherAttendance() {
     </div>
   );
 }
+`;
+fs.writeFileSync('src/pages/teacher/TeacherAttendance.tsx', content);

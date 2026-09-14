@@ -19,7 +19,7 @@ import {
   LogOut,
   Menu,
   X
-} from "lucide-react";
+, Clock, CheckCircle, User } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -45,6 +45,11 @@ const teacherLinks = [
   { name: "My Classes", icon: Users, href: "/teacher/classes" },
   { name: "Attendance", icon: CalendarCheck, href: "/teacher/attendance" },
   { name: "Homework", icon: BookOpen, href: "/teacher/homework" },
+  { name: "Exams & Marks", icon: FileText, href: "/teacher/marks" },
+  { name: "Notices", icon: Bell, href: "/teacher/notices" },
+  { name: "Timetable", icon: Clock, href: "/teacher/timetable" },
+  { name: "Class Progress", icon: CheckCircle, href: "/teacher/progress" },
+  { name: "Profile", icon: User, href: "/teacher/profile" },
 ];
 
 const parentLinks = [

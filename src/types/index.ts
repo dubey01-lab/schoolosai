@@ -199,14 +199,18 @@ export interface Homework {
   id?: string;
   schoolId: string;
   teacherId: string;
+  teacherName?: string;
   class: string;
   section: string;
   subject: string;
   title: string;
   description: string;
+  assignedDate?: string;
   dueDate: string;
-  status: "ACTIVE" | "ARCHIVED";
+  priority?: string;
+  status: "ACTIVE" | "ARCHIVED" | "PUBLISHED" | "CLOSED";
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface AttendanceRecord {
